@@ -39,6 +39,13 @@ SNPage cardstack_page("Cardstack Page", cardstack_elements, &setup_cardstack, &d
 // *******************************************************************************************************
 // Group3: SNElements' function initializations
 void function_data_change() {
+	// Roll Wiper at roll 36
+	if (recorded_rolls.size()%36 == 0) {
+		recorded_rolls.push_back(00);
+		for (int i = 0; i < 11; i++) {
+			(*nums_rolleds[i]) = 0;
+		}
+	}
 	my_app.current_page->draw_page();
 }
 void function_clear() {
@@ -52,6 +59,7 @@ void setup_helper_reset() {
 	for (int i = 0; i < 11; i++) {
 		(*nums_rolleds[i]) = 0;
 	}
+	recorded_rolls.clear();
 	my_app.activate_page(&cardstack_page);
 }
 void setup_cardstack() {
@@ -91,14 +99,6 @@ void draw_cardstack() {
 		int temp_y = i-x;
 		fill(255);
 		all_centered_text(to_string(recorded_rolls[i]), 30.45, temp_y+5, 1, 1, 0.6);
-	}
-
-	// Roll Wiper at roll 36
-	if (recorded_rolls.size() == 36) {
-		recorded_rolls.push_back(00);
-		for (int i = 0; i < 11; i++) {
-			(*nums_rolleds[i]) = 0;
-		}
 	}
 
 	// Top Right stack indicator
