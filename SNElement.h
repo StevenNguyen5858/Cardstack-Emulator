@@ -20,26 +20,26 @@ using namespace std;
 // Group0: SNProcessing and SNElement tool explanation.
 
 /*	Explanation for using this SNProcessing and SNElements tool:
-*	-This file's purpose is to emmulate the Processing 3.5.4 IDE. Until further 
+*	-This file's purpose is to emmulate the Processing 3.5.4 IDE. Until further
 *	implementation, processing.org can be used as a close documentation reference.
-*	Note that the main.cpp is setup similar to that IDE, main.cpp should 
+*	Note that the main.cpp is setup similar to that IDE, main.cpp should
 *	only be modified by writing code in the following functions:
 *	-void setup() Runs once at the initial instance before the application driver begins.
 *	-void draw() Runs continously as apart of the application driver.
 *	-The next functions are event handlers. They run prior to each draw() frame.
-*	-void mouse_pressed() Runs on the event the mouse is pressed. 
+*	-void mouse_pressed() Runs on the event the mouse is pressed.
 *	-void mouse_released() Runs on the event the mouse is released.
 *	Avoid modification of main(), unless planning to use unimplemented SFML features. */
 
-/*	SNElements description: 
-*	A Foundational project for future C++ application projects (GUI library extension). 
-*	This project relies on the SFML low level Graphics library. SFML is a library which 
+/*	SNElements description:
+*	A Foundational project for future C++ application projects (GUI library extension).
+*	This project relies on the SFML low level Graphics library. SFML is a library which
 *	handles primitive objects such as geometric shapes, image sprites and application windows.
 *	SNElements uses SFML to handle higher level objects such as pages and the elements
 *	that may be within them: buttons, radio buttons, sliders, lables, etc.
-*	
-*	For those wishing to use unimplemented SFML features keep in mind, SNProcessing renders to 
-*	a single application/RenderWindow. Multi-window applications will be supported in a 
+*
+*	For those wishing to use unimplemented SFML features keep in mind, SNProcessing renders to
+*	a single application/RenderWindow. Multi-window applications will be supported in a
 *	different version. */
 
 
@@ -73,6 +73,9 @@ sf::Image icon_video;
 sf::Image radio_empty;
 sf::Image radio_full;
 
+sf::Image bg2;
+sf::Image bg4;
+
 // Sets up the basic screen dimentions, then on the front end use is setting grid units sw and sh.
 void refresh_grid() {
 	int screen_width = main_window.getSize().x;
@@ -81,14 +84,48 @@ void refresh_grid() {
 	sh = screen_height / gridH;
 }
 void setup_window(int screen_width, int screen_height, string title) {
-	font.loadFromFile("SNElement Resources/cour.ttf");
-	icon_image.loadFromFile("SNElement Resources/ImageIcon.png");
-	icon_sound.loadFromFile("SNElement Resources/SoundIcon.png");
-	icon_text.loadFromFile("SNElement Resources/TextIcon.png");
-	icon_video.loadFromFile("SNElement Resources/VideoIcon.png");
+	bool couldnt_load = false;
+	if (!bg2.loadFromFile("SNElement Resources/BG2.png")) {
+		sf::err() << "Couldn't load BG2\n";
+		bool couldnt_load = true;
+	}
+	if (!bg4.loadFromFile("SNElement Resources/BG4.jpg")) {
+		sf::err() << "Couldn't load BG4\n";
+		bool couldnt_load = true;
+	}
+	if (!font.loadFromFile("SNElement Resources/cour.ttf")) {
+		sf::err() << "Couldn't load cour font\n";
+		bool couldnt_load = true;
+	}
+	if (!icon_image.loadFromFile("SNElement Resources/ImageIcon.png")) {
+		sf::err() << "Couldn't load ImageIcon\n";
+		bool couldnt_load = true;
+	}
+	if (!icon_sound.loadFromFile("SNElement Resources/SoundIcon.png")) {
+		sf::err() << "Couldn't load SoundIcon\n";
+		bool couldnt_load = true;
+	}
+	if (!icon_text.loadFromFile("SNElement Resources/TextIcon.png")) {
+		sf::err() << "Couldn't load TextIcon\n";
+		bool couldnt_load = true;
+	}
+	if (!icon_video.loadFromFile("SNElement Resources/VideoIcon.png")) {
+		sf::err() << "Couldn't load VideoIcon\n";
+		bool couldnt_load = true;
+	}
 
-	radio_empty.loadFromFile("SNElement Resources/RadioButtonEmpty.png");
-	radio_full.loadFromFile("SNElement Resources/RadioButtonFull.png");
+	if (!radio_empty.loadFromFile("SNElement Resources/RadioButtonEmpty.png")) {
+		sf::err() << "Couldn't load RadioEmptyIcon\n";
+		bool couldnt_load = true;
+	}
+	if (!radio_full.loadFromFile("SNElement Resources/RadioButtonFull.png")) {
+		sf::err() << "Couldn't load RadioFullIcon\n";
+		bool couldnt_load = true;
+	}
+
+	if (couldnt_load) {
+		sf::err() << "Application resources were not all loaded. Try repairing or reinstalling your application.\n";
+	}
 
 	main_window.create(sf::VideoMode(screen_width, screen_height), title);
 	refresh_grid();
@@ -119,7 +156,7 @@ void set_title(string str) {
 	setup_window(displayW, displayH, str);
 }
 // Draws rectangle to buffer.
-void rect(double x, double y, double w, double h) { 
+void rect(double x, double y, double w, double h) {
 	sf::RectangleShape r(sf::Vector2f(w * sw, h * sh));
 	r.setPosition(x * sw, y * sh);
 	r.setFillColor(current_fill);
@@ -136,31 +173,64 @@ void rect(double x, double y, double w, double h, int alpha) {
 	r.setOutlineColor(current_stroke);
 	main_window.draw(r);
 }
-// Draws text to buffer.
-void text(string str, double x, double y, double h) { 
-	sf::Text text;
-
-	text.setFont(font);
-	text.setStyle(sf::Text::Bold);
-	text.setString(str);
-	text.setCharacterSize(h * sh);
-	text.setPosition(sf::Vector2f(x * sw, y * sh - (h * sh * .1)));
-	text.setFillColor(current_fill);
-	main_window.draw(text);
+// Draws circle to buffer.
+void circle(double x, double y, double d) {
+	sf::CircleShape c(d / 2 * sw);
+	c.setPosition(x * sw, y * sh);
+	c.setFillColor(current_fill);
+	c.setOutlineThickness(current_stroke_weight);
+	c.setOutlineColor(current_stroke);
+	main_window.draw(c);
 }
-// Draws centered text within a given x, y, w and h to buffer.
-void centered_text(string str, double x, double y, double w, double h) { 
-	sf::Text text;
+// Draws circle with an alpha fill to buffer.
+void circle(double x, double y, double d, int alpha) {
+	sf::CircleShape c(d / 2 * sw);
+	c.setPosition(x * sw, y * sh);
+	c.setFillColor(sf::Color(current_fill.r, current_fill.g, current_fill.b, alpha));
+	c.setOutlineThickness(current_stroke_weight);
+	c.setOutlineColor(current_stroke);
+	main_window.draw(c);
+}
+// Draws line using vertex shape to buffer.
+class sfLine : public sf::Drawable {
+public:
+	sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2)
+		: fill(sf::Color::Yellow), thickness(1.f) {
+		sf::Vector2f direction = point2 - point1;
+		sf::Vector2f unitDirection = direction / std::sqrt(direction.x * direction.x + direction.y * direction.y);
+		sf::Vector2f unitPerpendicular(-unitDirection.y, unitDirection.x);
 
-	text.setFont(font);
-	text.setStyle(sf::Text::Bold);
-	text.setString(str);
-	text.setCharacterSize(h * sh);
-	int text_w = text.getGlobalBounds().width;
-	int centered_x = (x * sw) + ((w * sw) - text_w) / 2;
-	text.setPosition(sf::Vector2f(centered_x, y*sh));
-	text.setFillColor(current_fill);
-	main_window.draw(text);
+		sf::Vector2f offset = (thickness / 2.f) * unitPerpendicular;
+
+		vertices[0].position = point1 + offset;
+		vertices[1].position = point2 + offset;
+		vertices[2].position = point2 - offset;
+		vertices[3].position = point1 - offset;
+
+		for (int i = 0; i < 4; ++i) {
+			vertices[i].color = fill;
+		}
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const {
+		target.draw(vertices, 4, sf::Quads);
+	}
+	void setFillColor(sf::Color fill) {
+		for (int i = 0; i < 4; ++i) {
+			vertices[i].color = fill;
+		}
+	}
+
+public:
+	sf::Vertex vertices[4];
+	float thickness;
+	sf::Color fill;
+};
+void line(double x1, double y1, double x2, double y2) {
+	sfLine line(sf::Vector2f(x1 * sw, y1 * sh), sf::Vector2f(x2 * sw, y2 * sh));
+	line.setFillColor(current_fill);
+	line.thickness = current_stroke_weight;
+	main_window.draw(line);
 }
 // Returns grid based text width.
 double text_width(string str, double h) {
@@ -173,6 +243,58 @@ double text_width(string str, double h) {
 	double text_w = text.getGlobalBounds().width / sw;
 	return text_w;
 }
+// Draws text to buffer.
+void text(string str, double x, double y, double h) {
+	sf::Text text;
+	// Text Style:
+	text.setFont(font);
+	text.setStyle(sf::Text::Bold);
+	text.setFillColor(current_fill);
+	text.setString(str);
+	text.setCharacterSize(h * sh);
+	// Text Positioning:
+	text.setPosition(sf::Vector2f(x * sw, y * sh));
+
+	main_window.draw(text);
+}
+// Draws y centered text within a given x, y, h and text_h to buffer.
+void y_centered_text(string str, double x, double y, double h, double text_h) {
+	sf::Text text;
+	// Text Style:
+	text.setFont(font);
+	text.setStyle(sf::Text::Bold);
+	text.setFillColor(current_fill);
+	text.setString("l"); // Set string to l for consistent text height regardless of entered str
+	text.setCharacterSize(text_h * sh);
+	// Text Positioning:
+	double centered_offset_y = ((h * sh) - text.getGlobalBounds().height) / 2;
+	int centered_y = (y * sh) + centered_offset_y;
+	text.setString(str);
+	text.setOrigin(text.getGlobalBounds().left, text.getGlobalBounds().top);
+	text.setPosition(sf::Vector2f(int(x * sw), centered_y));
+
+	main_window.draw(text);
+}
+// Draws x and y centered text within a given x, y, w, h and text_h to buffer.
+void all_centered_text(string str, double x, double y, double w, double h, double text_h) {
+	sf::Text text;
+	// Text Style:
+	text.setFont(font);
+	text.setStyle(sf::Text::Bold);
+	text.setFillColor(current_fill);
+	text.setString("l"); // Set string to l for consistent text height regardless of entered strtext.setString(str);
+	text.setCharacterSize(text_h * sh);
+	// Text Positioning:
+	double centered_offset_y = ((h * sh) - text.getGlobalBounds().height) / 2;
+	int centered_y = (y * sh) + centered_offset_y;
+	text.setString(str);
+	double centered_offset_x = ((w * sw) - (text.getGlobalBounds().width)) / 2;
+	int centered_x = (x * sw) + centered_offset_x;
+	text.setOrigin(text.getGlobalBounds().left, text.getGlobalBounds().top);
+	text.setPosition(sf::Vector2f(centered_x, centered_y));
+
+	main_window.draw(text);
+}
 // Fills buffer with sf::Color.
 void background(sf::Color color) {
 	main_window.clear(color);
@@ -182,22 +304,22 @@ void background(int color) {
 	main_window.clear(sf::Color(color, color, color, 255));
 }
 // Draws an sf::image object to buffer at default image size.
-void image(sf::Image* img, int x, int y) { 
+void image(sf::Image* img, double x, double y) {
 	sf::Texture temp;
 	sf::Sprite sprit;
-	sprit.setPosition(sf::Vector2f(x * sw, y * sh));
+	sprit.setPosition(sf::Vector2f(int(x * sw), int(y * sh)));
 	temp.loadFromImage(*img);
 	sprit.setTexture(temp);
 	main_window.draw(sprit);
 }
 // Draws an sf::image object to buffer with given width and height.
 // Images scale best by factors of two.
-void image(sf::Image* img, int x, int y, int new_width, int new_height) { 
+void image(sf::Image* img, double x, double y, int new_width, int new_height) {
 	double scale_w = (float)(new_width * sw) / img->getSize().x;
 	double scale_h = (float)(new_height * sh) / img->getSize().y;
 	sf::Texture temp;
 	sf::Sprite sprit;
-	sprit.setPosition(sf::Vector2f(x * sw, y * sh));
+	sprit.setPosition(sf::Vector2f(int(x * sw), int(y * sh)));
 	temp.loadFromImage(*img);
 	sprit.setTexture(temp);
 	sprit.setScale(sf::Vector2f(scale_w, scale_h));
@@ -208,7 +330,7 @@ void image(sf::Image* img, int x, int y, int new_width, int new_height) {
 void dev_grid() {
 	stroke(120);
 	stroke_weight(1);
-	fill(32);
+	no_fill();
 	for (int x = 0; x < gridW + 1; x++) { // Note gridW is main display, the +1 is for partially displaying border
 		for (int y = 0; y < gridH + 1; y++) {
 			rect(x, y, 1, 1);
@@ -220,7 +342,15 @@ void dev_grid() {
 void gridless() {
 	main_window.clear(sf::Color(32, 32, 32));
 }
-
+// Image background.
+void background2() {
+	main_window.clear(sf::Color(32, 32, 32));
+	image(&bg2, 0, 0, 32, 18);
+}
+void background4() {
+	main_window.clear(sf::Color(32, 32, 32));
+	image(&bg4, 0, -2, 32, 24);
+}
 
 // ********************************************************************************************
 // Group2: SNElement classes : SNElement, SNButton, SNLabel, SNContainer, SNCache, SNPageand SNApp class.
@@ -250,7 +380,7 @@ public:
 		cout << " " << name << " (virtual draw func)." << x << "." << y << endl;
 		fill(220);
 		stroke(255);
-		stroke_weight(5);
+		stroke_weight(2);
 		rect(x, y, w, h, 25);
 	}
 };
@@ -260,19 +390,19 @@ class SNLabel : public SNElement {
 	// Access specifier:
 public:
 	string str;
-	int height;
+	double text_h;
 	bool isCentered;
 
 	// Default Constructor:
 	SNLabel() {
 	}
 	// Parameterized
-	SNLabel(string str, bool isCentered, double x, double y, double w, double h)
+	SNLabel(string str, bool isCentered, double x, double y, double w, double h, double text_h)
 		: SNElement(name, x, y, w, h) {
+		this->type = "SNLabel";
+		this->text_h = text_h;
 		this->str = str;
 		this->isCentered = isCentered;
-		this->height = h;
-		this->type = "SNLabel";
 	}
 
 	void draw_element() { // Overloading virtual parent func.
@@ -280,10 +410,10 @@ public:
 		fill(255);
 		stroke(255);
 		if (isCentered) {
-			centered_text(str, x, y, w, h);
+			all_centered_text(str, x, y, w, h, text_h);
 		}
 		else {
-			text(str, x, y, h);
+			y_centered_text(str, x, y, h, text_h);
 		}
 	}
 };
@@ -323,14 +453,14 @@ public:
 		else {
 			stroke(255);
 		}
-		stroke_weight(5);
+		stroke_weight(2);
 		rect(x, y, w, h, 25);
 		fill(255);
 		if (is_centered) {
-			centered_text(name, x, y, w, h*.6);
+			all_centered_text(name, x, y, w, h, h * .6);
 		}
 		else {
-			text(name, x + 0.2, y + (h * 0.15), h * .6);
+			y_centered_text(name, x + 0.2, y, h, h * .6);
 		}
 	}
 };
@@ -364,10 +494,10 @@ public:
 		else {
 			stroke(255);
 		}
-		stroke_weight(5);
+		stroke_weight(2);
 		rect(x, y, w, h, 25);
 		fill(255);
-		text(name, x + 0.2, y + (h * 0.15), h * .6);
+		y_centered_text(name, x + 0.2, y, h, h * 0.6);
 	}
 };
 
@@ -376,13 +506,13 @@ class SNRadio_Button : public SNButton {
 	// Access specififer:
 public:
 	bool is_selected = false;
-	SNRadio_Button **current_rb;
+	SNRadio_Button** current_rb;
 
 	// Deafult Constructor:
 	SNRadio_Button() {
 	}
 	// Parametereized Constructor:
-	SNRadio_Button(string name, double x, double y, double w, double h, void (*function)(), SNRadio_Button **current_rb)
+	SNRadio_Button(string name, double x, double y, double w, double h, void (*function)(), SNRadio_Button** current_rb)
 		: SNButton(name, x, y, w, h, function) {
 		this->type = "SNRadio_Button";
 		this->current_rb = current_rb;
@@ -398,8 +528,8 @@ public:
 			image(&radio_empty, x, y, 1, 1);
 		}
 		fill(255);
-		stroke_weight(3);
-		text(name, x + 1.2, y + .08, 0.6);
+		stroke_weight(2);
+		y_centered_text(name, x + 1.2, y, h, 0.6);
 	}
 	void radio_switch() {
 		SNRadio_Button* t = *current_rb;
@@ -440,7 +570,7 @@ public:
 		double title_w = ceil(text_width(title, 0.7)); // title
 		rect(x + title_w, y + .5, w - title_w, 0); // title line -----------------------------
 		fill(255);
-		centered_text(title, x, y, title_w, 0.6);
+		all_centered_text(title, x, y, title_w, 1, 0.6);
 		for (int i = 0; i < elements.size(); i++) {
 			elements[i]->draw_element();
 		}
@@ -518,8 +648,8 @@ public:
 			rect(x, y + 1, w, h - 1, 25);
 			fill(255);
 			stroke_weight(2);
-			centered_text(name, x, y + (0.15), w, 0.6);
-			centered_text(to_string(display_val), x, y + 1 + (0.15), w, 0.6);
+			all_centered_text(name, x, y, w, 1, 0.6);
+			all_centered_text(to_string(display_val), x, y + 1, w, 1, 0.6);
 			if (percent_chance > 0) {
 				string display_percent = to_string(percent_chance);
 				if (percent_chance / 10 > 1) {
@@ -527,7 +657,7 @@ public:
 				}else{
 					display_percent = display_percent.substr(0, 3);
 				}
-				centered_text(display_percent + "%", x, y + h + (0.15), w, 0.6);
+				all_centered_text(display_percent + "%", x, y + h, w, 1, 0.6);
 			}
 		}
 		else {
@@ -535,8 +665,8 @@ public:
 			rect(x, y-h, w, h - 1, 25);
 			fill(255);
 			stroke_weight(2);
-			centered_text(name, x, y -1 + (0.15), w, 0.6);
-			centered_text(to_string(display_val), x, y-2 + (0.15), w, 0.6);
+			all_centered_text(name, x, y -1, w, 1, 0.6);
+			all_centered_text(to_string(display_val), x, y-2 , w, 1, 0.6);
 		}
 	}
 	void data_change() {
@@ -759,8 +889,8 @@ void function_open_page(int pos);
 void function_rb_dev();
 void function_rb_plain();
 
-SNLabel l_SNEM_title("SNElements Main:", false, 1, 0, text_width("SNElements Main", 2), 1.5);
-SNLabel l_sidebar_title("View Options:", true, 25, 0.1, 7, .6);
+SNLabel l_SNEM_title("SNElements Main:", false, 1, 0, 6, 2, text_width("SNElements Main", 2));
+SNLabel l_sidebar_title("View Options:", true, 25, 0.1, 7, 1, .6);
 SNRadio_Button* SNEM_current_rb;
 SNRadio_Button rb_dev("Developer Grid", 25, 2, 7, 1, &function_rb_dev, &SNEM_current_rb);
 SNRadio_Button rb_plain("No Grid", 25, 3, 7, 1, &function_rb_plain, &SNEM_current_rb);

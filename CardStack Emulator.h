@@ -17,8 +17,8 @@ void function_data_change();
 void setup_helper_reset();
 void function_clear();
 
-SNLabel l_remaining_cardstack("Maximum cards left", true, 11, -.2, 10, 1);
-SNLabel l_dice_statistics("Dice Statistics", true, 11, 16.8, 10, 1);
+SNLabel l_remaining_cardstack("Maximum cards left", true, 11, 0, 10, 1, 0.8);
+SNLabel l_dice_statistics("Dice Statistics", true, 11, 17, 10, 1, 0.8);
 SNButton b_reset("Reset Stack", 9.5, 8.5, 5, 1, true, &setup_helper_reset);
 SNButton b_clear("Clear Rolls", 17.5, 8.5, 5, 1, true, &function_clear);
 
@@ -90,7 +90,7 @@ void draw_cardstack() {
 	for (int i = x; i < recorded_rolls.size(); i++) {
 		int temp_y = i-x;
 		fill(255);
-		centered_text(to_string(recorded_rolls[i]), 30.45, temp_y+5.1, 1, 0.6);
+		y_centered_text(to_string(recorded_rolls[i]), 30.45, temp_y+5.1, 1, 0.6);
 	}
 
 	// Roll Wiper at roll 36
@@ -108,5 +108,5 @@ void draw_cardstack() {
 		sum += *nums_rolleds[i];
 	}
 	string num_rolls = to_string(sum);
-	centered_text(num_rolls + "/36", 30, 0.1, 2, 0.6);
+	y_centered_text(num_rolls + "/36", 30, 0.1, 2, 0.6);
 }
