@@ -90,7 +90,7 @@ void draw_cardstack() {
 	for (int i = x; i < recorded_rolls.size(); i++) {
 		int temp_y = i-x;
 		fill(255);
-		y_centered_text(to_string(recorded_rolls[i]), 30.45, temp_y+5.1, 1, 0.6);
+		all_centered_text(to_string(recorded_rolls[i]), 30.45, temp_y+5, 1, 1, 0.6);
 	}
 
 	// Roll Wiper at roll 36

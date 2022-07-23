@@ -266,6 +266,7 @@ void y_centered_text(string str, double x, double y, double h, double text_h) {
 	text.setFillColor(current_fill);
 	text.setString("l"); // Set string to l for consistent text height regardless of entered str
 	text.setCharacterSize(text_h * sh);
+	
 	// Text Positioning:
 	double centered_offset_y = ((h * sh) - text.getGlobalBounds().height) / 2;
 	int centered_y = (y * sh) + centered_offset_y;
@@ -283,7 +284,9 @@ void all_centered_text(string str, double x, double y, double w, double h, doubl
 	text.setStyle(sf::Text::Bold);
 	text.setFillColor(current_fill);
 	text.setString("l"); // Set string to l for consistent text height regardless of entered strtext.setString(str);
-	text.setCharacterSize(text_h * sh);
+	int smallest_s = (sh > sw) ? sw : sh;
+	int text_s = (text_width(str, text_h)>(w-0.4)) ? smallest_s : sh;
+	text.setCharacterSize(text_h * text_s);
 	// Text Positioning:
 	double centered_offset_y = ((h * sh) - text.getGlobalBounds().height) / 2;
 	int centered_y = (y * sh) + centered_offset_y;
