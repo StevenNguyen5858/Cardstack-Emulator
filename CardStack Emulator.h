@@ -108,5 +108,5 @@ void draw_cardstack() {
 		sum += *nums_rolleds[i];
 	}
 	string num_rolls = to_string(sum);
-	y_centered_text(num_rolls + "/36", 30, 0.1, 2, 0.6);
+	all_centered_text(num_rolls + "/36", 28, 0.1, 4, 1, 0.6);
 }
